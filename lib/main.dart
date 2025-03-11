@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -13,7 +13,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(),
+      home: const MyHomePage(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
@@ -26,32 +27,73 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  List<Step> StepList() => [
-        const Step(
-            title: Text('Account'),
-            content: Center(
-              child: Text('Account'),
-            )),
-        const Step(
-            title: Text('Address'),
-            content: Center(
-              child: Text('Address'),
-            )),
-        const Step(
-            title: Text('Confirm'),
-            content: Center(
-              child: Text('Confirm'),
-            )),
+  int _currentStep = 0;
+
+  List<Step> stepList() => [
+        Step(
+          title: const Text('Account'),
+          content: const Center(
+            child: Text('Account Information'),
+          ),
+          isActive: _currentStep >= 0,
+        ),
+        Step(
+          title: const Text('Address'),
+          content: const Center(
+            child: Text('Address Information'),
+          ),
+          isActive: _currentStep >= 1,
+        ),
+        Step(
+          title: const Text('Confirm'),
+          content: const Center(
+            child: Text('Confirmation'),
+          ),
+          isActive: _currentStep >= 2,
+        ),
       ];
+
+  void _moveToNextStep() {
+    if (_currentStep < stepList().length - 1) {
+      setState(() {
+        _currentStep++;
+      });
+    }
+  }
+
+  void _moveToPreviousStep() {
+    if (_currentStep > 0) {
+      setState(() {
+        _currentStep--;
+      });
+    }
+  }
+
+  void _onStepContinue() {
+    if (_currentStep == stepList().length - 1) {
+      // Perform form submission or final action
+      print('Form Completed');
+    } else {
+      _moveToNextStep();
+    }
+  }
+
+  void _onStepCancel() {
+    _moveToPreviousStep();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Flutter steper form"),
+        title: const Text("Flutter Stepper Form"),
       ),
       body: Stepper(
         type: StepperType.horizontal,
-        steps: StepList(),
+        steps: stepList(),
+        currentStep: _currentStep,
+        onStepContinue: _onStepContinue,
+        onStepCancel: _onStepCancel,
       ),
     );
   }
